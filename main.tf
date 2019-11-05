@@ -1,6 +1,13 @@
 # terraform apply -var-file="variable.tfvars"
 variable "region" {}
 variable "profile" {}
+
+variable server_port {
+    description = "The port the server will use for HTTP requests"
+    type = number
+    default     = 8080
+}
+
 variable "my_ami" {
     type = "map"
 }
@@ -12,7 +19,7 @@ provider "aws" {
 
 # resource "<PROVIDER>_<TYPE>" "<NAME>" { [CONFIG ...]}
 resource "aws_instance" "web_server" { # creating resources for aws provider
-  count = 1 # create 10 ec2 instances
+  # count = 1 # create 10 ec2 instances
   ami = "${lookup(var.my_ami, var.region)}"
   instance_type = "t1.micro"
   vpc_security_group_ids = [aws_security_group.web_security_group.id]
@@ -28,8 +35,8 @@ resource "aws_security_group" "web_security_group" {
   name = "web-server-instance"
   # Allow EC2 Instance to receive traffic on port 8080
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = var.server_port
+    to_port     = var.server_port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] 
     # allow incoming TCP request on port 8080 from the CIDR block 0.0.0.0/0 (any IP).
@@ -37,3 +44,7 @@ resource "aws_security_group" "web_security_group" {
   }
 }
 
+output "public_ip" {
+  value         = aws_instance.web_server.public_ip
+  description   = "The public IP address of the web server"
+}

@@ -6,3 +6,7 @@ my_ami = {
     # "us-east-1" = "ami-00dc79254d0461090" # Amazon Linux 2 AMI
     "us-east-1" = "ami-04b9e92b5572fa0d1" # Ubuntu AMI
 }
+
+
+
+
